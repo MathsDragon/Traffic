@@ -8,25 +8,26 @@ Created on Mon Sep 18 18:09:58 2017
 import pygame
 
 import random
-import pickle
 simulation = False
 population = 0.0
-h = 80
+h = 100
 
 class Slider:
-    def __init__(self,x,y):
+    def __init__(self,x,y,screen):
+        self.screen = screen
         self.x = x
         self.y = y
         self.sx = x
         self.sy =y
     def update(self):
-        pos = pygame.mouse.get_pos()
-        if (pos[1] > self.y and pos[1] < self.y+10) and (pos[0] > self.x and pos[1] < self.x+50):
-            self.sx = pos[0]-5
-            self.sy = pos[1]
-        pygame.draw.rect(screen,
-                            [255, 0, 0],
-                            [self.sx,self.sy,5,10,])
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                pos = pygame.mouse.get_pos()
+                if (pos[1] > self.y and pos[1] < self.y+10) and (pos[0] > self.x and pos[1] < self.x+50):
+                    self.sx = pos[0]-5
+                    self.sy = pos[1]
+                    print("Slider")
+        pygame.draw.rect(self.screen,[255, 0, 0],[self.sx,self.sy,5,10,])
 
 
 class Car:
@@ -38,9 +39,9 @@ class Car:
         self.new = None
         self.old = None
         self.now = None
-        colours = [125,255]
-        hue = random.randint(0,1)
-        self.color = [colours[1-hue], colours[hue], colours[hue]]
+#        colours = [125,255]
+#        hue = random.randint(0,2)
+        self.color = [0, random.randint(50,255), 0]
         self.traffic = False
 
     def update(self, i):
@@ -245,7 +246,7 @@ for i in range(h):
     for k in range(h):
         occupied[i].append(False)
 
-value = Slider(0,0)
+#value = Slider(0,950, screen)
 while not done:
     screen.fill([60, 80, 110])
     for event in pygame.event.get():
@@ -354,19 +355,19 @@ while not done:
         with open("map.txt",'w') as f:
             print(grid)
             total = ""
-            for i in range(h):
-                for j in range(h):
-                    total += str(grid[i][j])
+            for i in range(road):
+                for j in range(2):
+                    total += str(road[i][j])
             f.write(total)
 
     elif pressed[pygame.K_CAPSLOCK]:
         Road.vertices = []
+        print(Road.vertices)
         with open("map.txt", 'r') as f:
             total = f.read()
-            for i in range(h):
-                for j in range(h):
-                    grid[i][j] = int(total[i*h+j])
-        print(grid)
+            road = []
+            for i in range(len(total)/2):
+                    road.append([int(total[i*2]),int(total[i*2+1])])
 
 
 
@@ -447,7 +448,7 @@ while not done:
                                   (HEIGHT + MARGIN) * i + MARGIN,
                                   WIDTH,
                                   HEIGHT])
-
+#    value.update()
     for track in Graph.vertices:
         pygame.draw.rect(screen,
                          [0, 0, 0],
